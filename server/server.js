@@ -1,21 +1,33 @@
-const express = require('express')
-const cors = require('cors')
-const path = require('path')
-const app = express()
-const db = require('./db/conn')
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+const app = express();
+
+// Middleware
 app.use(cors());
-app.use(express.json())
-const port = 5000;
+app.use(express.json());
 
-app.get('/record', require(path.join(__dirname, 'routes/records.js')))
-app.get('/quiz', require(path.join(__dirname, 'routes/records.js')))
-app.post('/contact', require(path.join(__dirname, 'routes/records.js')))
-app.post('/signup', require(path.join(__dirname, 'routes/records.js')))
-app.post('/signin', require(path.join(__dirname, 'routes/records.js')))
-app.post('/scoreBoard', require(path.join(__dirname, 'routes/records.js')))
-app.post('/profile', require(path.join(__dirname, 'routes/records.js')))
+// PORT (Render will auto-assign one, locally fallback to 5000)
+const PORT = process.env.PORT || 5000;
 
-app.listen(port, () => {
-    db.connectDB();
-    console.log("Listening on port: " + port);
+// MongoDB connection string from environment variables
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 })
+.then(() => console.log("✅ MongoDB connected"))
+.catch(err => console.error("❌ MongoDB connection error:", err));
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
